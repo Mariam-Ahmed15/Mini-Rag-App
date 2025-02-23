@@ -1,4 +1,4 @@
-from BaseController import BaseController
+from .BaseController import BaseController
 from fastapi import UploadFile # type: ignore
 from models import ResponseSignal
 import os
