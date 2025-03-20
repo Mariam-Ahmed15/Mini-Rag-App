@@ -1,17 +1,17 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
-from bson.objectid import ObjectId # type: ignore
+from bson.objectid import ObjectId  # type: ignore # Ensure pymongo is installed
 
 class Project(BaseModel):
-    _id: Optional[ObjectId]
+    id: Optional[ObjectId] = Field(None, alias="_id")
     project_id: str = Field(..., min_length=1)
 
-    @validator('project_id')
-    def validate_project_id(cls, value):
+    @field_validator('project_id')
+    @classmethod
+    def validate_project_id(cls, value: str) -> str:
         if not value.isalnum():
             raise ValueError('project_id must be alphanumeric')
-        
         return value
     
-    class config:
+    class Config:  # Fix: Use uppercase 'C'
         arbitrary_types_allowed = True
