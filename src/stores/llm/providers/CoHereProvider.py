@@ -26,6 +26,7 @@ class CoHereProvider(LLMInterface):
 
         self.client = cohere.Client(api_key= self.api_key)
 
+        self.enums=CoHereEnums
         self.logger = logging.getLogger(__name__)
 
     def set_generation_model(self, model_id: str):
@@ -60,7 +61,7 @@ class CoHereProvider(LLMInterface):
             max_tokens = max_output_tokens
         )
 
-        if not response or not response.txt:
+        if not response or not response.text:
             self.logger.error("Error while generating text with Cohere")
 
         return response.text
@@ -76,25 +77,25 @@ class CoHereProvider(LLMInterface):
             return None
         
         input_type = CoHereEnums.DOCUMENT
-        if document_type == DocumentTypeEnum.Query:
+        if document_type == DocumentTypeEnum.QUERY:
             input_type = CoHereEnums.QUERY
 
         response = self.client.embed(
             model = self.embedding_model_id,
             texts = [self.process_text(text)],
-            inpute_type = input_type,
+            input_type = input_type,
             embedding_types = ['float']
         )
 
-        if not response or not response.embeddings or not response.imbeddings.float:
+        if not response or not response.embeddings or not response.embeddings.float:
             self.logger.error("Error while embedding text with CoHere")
             return None 
         
         return response.embeddings.float[0]
 
-    def construct_prompt(self, prompt:str, role:str ):
+    def construct_prompt(self, prompt: str, role: str):
         return {
             "role": role,
-            "prompt": self.process_text(prompt)
+            "message": self.process_text(prompt)
         }
 
